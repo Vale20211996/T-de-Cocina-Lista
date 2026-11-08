@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Utensilios y Cosas de Cocina</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-full flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-100 p-2 rounded-xl text-amber-600">
+                    <i class="fa-solid fa-utensils text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 leading-tight">Inventario de Cocina</h1>
+                    <p class="text-xs text-slate-500">Selecciona lo que deseas llevar</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="openAdminModal()" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium px-4 py-2 rounded-xl transition-all">
+                    <i class="fa-solid fa-lock text-xs"></i>
+                    <span>Panel Dueño</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Hero / Stats Section -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-3">Organización de Utensilios</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">¡Ayúdanos completando la lista!</h2>
+                <p class="text-amber-100 text-sm sm:text-base max-w-xl">
+                    Haz clic en cualquier utensilio disponible para registrar tu nombre y confirmar que lo llevarás. Los demás solo verán que ya está cubierto.
+                </p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-6 flex items-center space-x-6 border border-white/20 w-full md:w-auto justify-around">
+                <div class="text-center">
+                    <span id="stat-total" class="block text-2xl sm:text-3xl font-bold">0</span>
+                    <span class="text-xs text-amber-100 uppercase tracking-wider font-medium">Total</span>
+                </div>
+                <div class="h-10 w-px bg-white/20"></div>
+                <div class="text-center">
+                    <span id="stat-available" class="block text-2xl sm:text-3xl font-bold text-emerald-300">0</span>
+                    <span class="text-xs text-amber-100 uppercase tracking-wider font-medium">Disponibles</span>
+                </div>
+                <div class="h-10 w-px bg-white/20"></div>
+                <div class="text-center">
+                    <span id="stat-taken" class="block text-2xl sm:text-3xl font-bold text-amber-200">0</span>
+                    <span class="text-xs text-amber-100 uppercase tracking-wider font-medium">Asignados</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+            <div class="relative w-full sm:w-96">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterItems()" placeholder="Buscar utensilio..." 
+                    class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-sm transition-all">
+            </div>
+            <div class="flex items-center space-x-2 w-full sm:w-auto">
+                <button onclick="setFilter('all')" id="filter-all" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white shadow-sm transition-all">Todos</button>
+                <button onclick="setFilter('available')" id="filter-available" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all">Disponibles</button>
+                <button onclick="setFilter('taken')" id="filter-taken" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all">Ocupados</button>
+            </div>
+        </div>
+
+        <!-- Utensils Grid -->
+        <div id="utensilsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Dynamic items populated here -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <p>Organizador comunitario de utensilios de cocina • Todos los datos se guardan en este navegador.</p>
+    </footer>
+
+    <!-- MODAL: Claim Item (Public) -->
+    <div id="claimModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-amber-100 p-2.5 rounded-2xl text-amber-600">
+                        <i class="fa-solid fa-hand-holding-heart text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-900">Anotar utensilio</h3>
+                        <p class="text-xs text-slate-500" id="modalItemName">Nombre del objeto</p>
+                    </div>
+                </div>
+                <button onclick="closeClaimModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-100 transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="claimForm" onsubmit="submitClaim(event)" class="space-y-4">
+                <input type="hidden" id="modalItemId">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Tu Nombre y Apellido *</label>
+                    <input type="text" id="userNameInput" required placeholder="Ej. María Pérez" 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Comentario opcional</label>
+                    <input type="text" id="userCommentInput" placeholder="Ej. Lo llevo el sábado / Es de acero" 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all">
+                </div>
+                <div class="pt-2 flex space-x-3">
+                    <button type="button" onclick="closeClaimModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-2xl text-sm transition-all">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-4 rounded-2xl text-sm shadow-md transition-all">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Admin Password Prompt -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-100 p-2.5 rounded-2xl text-indigo-600">
+                        <i class="fa-solid fa-lock text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-900">Acceso Dueño</h3>
+                        <p class="text-xs text-slate-500">Contraseña de administrador</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminLoginModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-100 transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="verifyAdmin(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="adminPasswordInput" required placeholder="Contraseña (por defecto: admin123)" 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                    <p class="text-[11px] text-slate-400 mt-1">Por defecto: <strong>admin123</strong></p>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeAdminLoginModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-2xl text-sm transition-all">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-2xl text-sm shadow-md transition-all">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Admin Panel Dashboard -->
+    <div id="adminPanelModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-100 p-2.5 rounded-2xl text-indigo-600">
+                        <i class="fa-solid fa-shield-halved text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-900">Panel de Administración</h3>
+                        <p class="text-xs text-slate-500">Vista exclusiva del dueño: controla quién lleva cada artículo</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="addNewItemPrompt()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition-all">
+                        <i class="fa-solid fa-plus mr-1"></i> Añadir Objeto
+                    </button>
+                    <button onclick="closeAdminPanel()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-200 transition-all">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content / Table -->
+            <div class="p-6 overflow-y-auto flex-grow">
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs uppercase tracking-wider font-semibold border-b border-slate-200">
+                                <th class="p-4">Utensilio</th>
+                                <th class="p-4">Estado</th>
+                                <th class="p-4">Quién lo lleva</th>
+                                <th class="p-4">Comentario</th>
+                                <th class="p-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-slate-200 text-sm">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center">
+                <span class="text-xs text-slate-500" id="adminSummaryCount">Total ítems: 0</span>
+                <button onclick="closeAdminPanel()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-5 rounded-xl text-xs transition-all">Cerrar Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-2xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage">Operación exitosa</span>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Default master list provided by user
+        const defaultItems = [
+            "Olla Multiusos",
+            "Parrilla",
+            "Pyrex",
+            "Olla cocimiento lento",
+            "Coffeemaker",
+            "Olla arrocera",
+            "Licuadora",
+            "Cafetera",
+            "Tostadora",
+            "Microondas",
+            "Freidora de aire",
+            "Batidora",
+            "Cucharas de cocina",
+            "Cuchillos",
+            "Tabla de picar",
+            "Espátulas",
+            "Cucharón",
+            "Escurridor",
+            "Rallador",
+            "Tazas de café",
+            "Vasos",
+            "Vajilla",
+            "Cubiertos",
+            "Set de ollas",
+            "Sartenes",
+            "Moldes para hornear",
+            "Exprimidor de cítricos",
+            "Picadora de alimentos",
+            "Hervidor eléctrico",
+            "Waflera",
+            "Sandwichera",
+            "Espumador de leche",
+            "Extractor de humedad",
+            "Pinzas de cocina",
+            "Entre otros"
+        ];
+
+        let utensilsData = [];
+        let currentFilter = 'all';
+
+        // Initialize LocalStorage or load items
+        function initApp() {
+            const saved = localStorage.getItem('kitchen_utensils_data');
+            if (saved) {
+                try {
+                    utensilsData = JSON.parse(saved);
+                } catch (e) {
+                    utensilsData = generateDefaultData();
+                }
+            } else {
+                utensilsData = generateDefaultData();
+            }
+            renderApp();
+        }
+
+        function generateDefaultData() {
+            return defaultItems.map((name, index) => ({
+                id: 'item_' + index + '_' + Date.now().toString(36),
+                name: name,
+                status: 'available', // 'available' or 'taken'
+                owner: '',
+                comment: ''
+            }));
+        }
+
+        function saveData() {
+            localStorage.setItem('kitchen_utensils_data', JSON.stringify(utensilsData));
+        }
+
+        // Render public view grid and stats
+        function renderApp() {
+            const grid = document.getElementById('utensilsGrid');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = utensilsData.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchVal);
+                if (currentFilter === 'available') return matchesSearch && item.status === 'available';
+                if (currentFilter === 'taken') return matchesSearch && item.status === 'taken';
+                return matchesSearch;
+            });
+
+            // Update stats
+            const total = utensilsData.length;
+            const available = utensilsData.filter(i => i.status === 'available').length;
+            const taken = total - available;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-available').innerText = available;
+            document.getElementById('stat-taken').innerText = taken;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center">
+                        <div class="bg-slate-100 text-slate-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <p class="text-slate-500 font-medium text-sm">No se encontraron utensilios.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const isTaken = item.status === 'taken';
+                return `
+                    <div class="bg-white rounded-2xl p-5 border ${isTaken ? 'border-amber-200 bg-amber-50/30' : 'border-slate-200 hover:border-amber-300 hover:shadow-md'} transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <span class="w-10 h-10 rounded-xl flex items-center justify-center text-base shrink-0 ${isTaken ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-600'}">
+                                    <i class="fa-solid ${getIconClass(item.name)}"></i>
+                                </span>
+                                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider ${isTaken ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
+                                    ${isTaken ? '<i class="fa-solid fa-check mr-1"></i> Ocupado' : 'Disponible'}
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-base mb-1 ${isTaken ? 'line-through text-slate-500' : ''}">${escapeHtml(item.name)}</h3>
+                            ${isTaken && item.comment ? `<p class="text-xs text-slate-500 italic mt-1"><i class="fa-solid fa-quote-left mr-1"></i>${escapeHtml(item.comment)}</p>` : ''}
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400">${isTaken ? 'Ya comprometido' : '¡Haz clic para llevar!'}</span>
+                            ${isTaken 
+                                ? `<button disabled class="bg-slate-100 text-slate-400 text-xs font-semibold px-3.5 py-2 rounded-xl cursor-not-allowed">Asignado</button>`
+                                : `<button onclick="openClaimModal('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-sm transition-all flex items-center space-x-1.5">
+                                    <span>Llevar</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                   </button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Return appropriate icon based on name
+        function getIconClass(name) {
+            const n = name.toLowerCase();
+            if (n.includes('olla') || n.includes('ollas')) return 'fa-pot-food';
+            if (n.includes('cafetera') || n.includes('coffeemaker')) return 'fa-mug-hot';
+            if (n.includes('taza') || n.includes('vaso')) return 'fa-cup-straw';
+            if (n.includes('cuchillo') || n.includes('cubierto')) return 'fa-utensils';
+            if (n.includes('licuadora') || n.includes('procesadora') || n.includes('picadora')) return 'fa-blender';
+            if (n.includes('tostadora') || n.includes('sandwichera') || n.includes('waflera')) return 'fa-bread-slice';
+            if (n.includes('microondas') || n.includes('freidora') || n.includes('horno')) return 'fa-fire-burner';
+            if (n.includes('tabla')) return 'fa-plate-wheat';
+            return 'fa-kitchen-set';
+        }
+
+        function filterItems() {
+            renderApp();
+        }
+
+        function setFilter(type) {
+            currentFilter = type;
+            ['all', 'available', 'taken'].forEach(t => {
+                const btn = document.getElementById(`filter-${t}`);
+                if (t === type) {
+                    btn.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white shadow-sm transition-all";
+                } else {
+                    btn.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all";
+                }
+            });
+            renderApp();
+        }
+
+        // Claim Modal Logic
+        function openClaimModal(id) {
+            const item = utensilsData.find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('modalItemId').value = item.id;
+            document.getElementById('modalItemName').innerText = item.name;
+            document.getElementById('userNameInput').value = '';
+            document.getElementById('userCommentInput').value = '';
+            document.getElementById('claimModal').classList.remove('hidden');
+            document.getElementById('userNameInput').focus();
+        }
+
+        function closeClaimModal() {
+            document.getElementById('claimModal').classList.add('hidden');
+        }
+
+        function submitClaim(e) {
+            e.preventDefault();
+            const id = document.getElementById('modalItemId').value;
+            const name = document.getElementById('userNameInput').value.trim();
+            const comment = document.getElementById('userCommentInput').value.trim();
+
+            if (!name) return;
+
+            const item = utensilsData.find(i => i.id === id);
+            if (item) {
+                item.status = 'taken';
+                item.owner = name;
+                item.comment = comment;
+                saveData();
+                renderApp();
+                closeClaimModal();
+                showToast(`¡Gracias ${name}! Has registrado '${item.name}'`);
+            }
+        }
+
+        // Admin Auth & Panel
+        function openAdminModal() {
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').focus();
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.add('hidden');
+        }
+
+        function verifyAdmin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPasswordInput').value;
+            // Password default: 'admin123'
+            if (pass === 'admin123') {
+                closeAdminLoginModal();
+                openAdminPanel();
+            } else {
+                showToast('Contraseña incorrecta', true);
+            }
+        }
+
+        function openAdminPanel() {
+            renderAdminTable();
+            document.getElementById('adminPanelModal').classList.remove('hidden');
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanelModal').classList.add('hidden');
+            renderApp(); // refresh main view if changes made
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            document.getElementById('adminSummaryCount').innerText = `Total ítems: ${utensilsData.length}`;
+
+            if (utensilsData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No hay elementos registrados.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = utensilsData.map(item => {
+                const isTaken = item.status === 'taken';
+                return `
+                    <tr class="hover:bg-slate-50 transition-all">
+                        <td class="p-4 font-medium text-slate-900">${escapeHtml(item.name)}</td>
+                        <td class="p-4">
+                            <span class="inline-flex items-center text-xs px-2.5 py-1 rounded-full font-semibold ${isTaken ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
+                                ${isTaken ? 'Ocupado' : 'Disponible'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-slate-700 font-semibold">${isTaken ? escapeHtml(item.owner) : '<span class="text-slate-400 font-normal">Nadie aún</span>'}</td>
+                        <td class="p-4 text-slate-500 italic text-xs">${escapeHtml(item.comment || '-')}</td>
+                        <td class="p-4 text-right space-x-2">
+                            ${isTaken 
+                                ? `<button onclick="releaseItem('${item.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all" title="Liberar ítem">Liberar</button>`
+                                : `<span class="text-slate-400 text-xs">Libre</span>`
+                            }
+                            <button onclick="deleteItem('${item.id}')" class="bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 p-2 rounded-xl text-xs transition-all" title="Eliminar ítem"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function releaseItem(id) {
+            const item = utensilsData.find(i => i.id === id);
+            if (item) {
+                item.status = 'available';
+                item.owner = '';
+                item.comment = '';
+                saveData();
+                renderAdminTable();
+                showToast(`Se liberó '${item.name}'`);
+            }
+        }
+
+        function deleteItem(id) {
+            if (confirm('¿Estás seguro de eliminar este utensilio de la lista?')) {
+                utensilsData = utensilsData.filter(i => i.id !== id);
+                saveData();
+                renderAdminTable();
+                showToast('Utensilio eliminado');
+            }
+        }
+
+        function addNewItemPrompt() {
+            const name = prompt('Nombre del nuevo utensilio o cosa de cocina:');
+            if (name && name.trim() !== '') {
+                const newItem = {
+                    id: 'item_' + Date.now().toString(36),
+                    name: name.trim(),
+                    status: 'available',
+                    owner: '',
+                    comment: ''
+                };
+                utensilsData.push(newItem);
+                saveData();
+                renderAdminTable();
+                showToast('¡Utensilio agregado exitosamente!');
+            }
+        }
+
+        // Toast Helper
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.innerText = message;
+            toast.className = `fixed bottom-6 right-6 text-white text-xs font-medium px-4 py-3 rounded-2xl shadow-xl transform transition-all duration-300 z-50 flex items-center space-x-2 ${isError ? 'bg-rose-600' : 'bg-slate-900'}`;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Escape HTML helper
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Run on load
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
