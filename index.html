@@ -57,6 +57,20 @@
             opacity: 0.9;
         }
 
+        .notice-banner {
+            background: var(--card-bg);
+            border: 2px solid var(--accent-pink);
+            padding: 15px 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: var(--dark-pink);
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.05);
+            line-height: 1.5;
+        }
+
         .owner-btn-container {
             position: absolute;
             top: 20px;
@@ -189,7 +203,7 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 0.9rem;
             outline: none;
             transition: border-color 0.2s;
@@ -218,13 +232,14 @@
             background: var(--dark-pink);
         }
 
-        .btn-action.release {
-            background: #e0e0e0;
-            color: #555;
+        .btn-action.change {
+            background: #f8bbd0;
+            color: var(--dark-pink);
         }
 
-        .btn-action.release:hover {
-            background: #bdbdbd;
+        .btn-action.change:hover {
+            background: #f48fb1;
+            color: white;
         }
 
         /* Footer Custom Message */
@@ -311,6 +326,12 @@
             <p>Selecciona el utensilio que deseas llevar y ayúdanos a completar la lista.</p>
         </header>
 
+        <!-- Aclaración sugerencias -->
+        <div class="notice-banner">
+            ✨ Los artículos que aparecen son solamente sugerencias, no tienen que ser exactamente iguales a los de la lista.<br>
+            ¡Cualquier detalle que elijan con cariño será muy especial para nosotros! 💕
+        </div>
+
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -341,7 +362,7 @@
 
         <!-- Custom Final Message -->
         <div class="custom-footer-msg">
-            ✨ Puedes llevar lo que gustes o lo que salga de tu creatividad ✨
+            Puedes llevar what gustes o lo que salga de tu creatividad
         </div>
     </div>
 
@@ -377,7 +398,7 @@
             "Extractor de humedad", "Pinzas de cocina"
         ];
 
-        let items = JSON.parse(localStorage.getItem('kitchen_items_v2')) || initialItems.map(name => ({
+        let items = JSON.parse(localStorage.getItem('kitchen_items_v4')) || initialItems.map(name => ({
             name: name,
             takenBy: null
         }));
@@ -385,7 +406,7 @@
         let currentFilter = 'all';
 
         function saveAndRender() {
-            localStorage.setItem('kitchen_items_v2', JSON.stringify(items));
+            localStorage.setItem('kitchen_items_v4', JSON.stringify(items));
             render();
         }
 
@@ -418,8 +439,8 @@
                     </div>
                     <div class="action-area">
                         ${isTaken ? `
-                            <p style="font-size: 0.85rem; color: #880e4f; margin-bottom: 8px; font-weight: 500;">Cubierto por la comunidad</p>
-                            <button class="btn-action release" onclick="releaseItem(${index})">Liberar producto</button>
+                            <p style="font-size: 0.82rem; color: #880e4f; margin-bottom: 6px; font-weight: 500;">Cubierto por la comunidad</p>
+                            <button class="btn-action change" onclick="changeItem(${index})">🔄 Escoger otro / Cambiar</button>
                         ` : `
                             <input type="text" id="name-${index}" placeholder="Tu nombre y apellido">
                             <button class="btn-action take" onclick="takeItem(${index})">¡Llevar!</button>
@@ -441,8 +462,8 @@
             saveAndRender();
         }
 
-        function releaseItem(index) {
-            if (confirm('¿Estás seguro de liberar este utensilio?')) {
+        function changeItem(index) {
+            if (confirm('¿Deseas liberar este artículo para escoger otro diferente?')) {
                 items[index].takenBy = null;
                 saveAndRender();
             }
