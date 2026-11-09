@@ -139,6 +139,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
+            margin-bottom: 30px;
         }
 
         .item-card {
@@ -226,6 +227,20 @@
             background: #bdbdbd;
         }
 
+        /* Footer Custom Message */
+        .custom-footer-msg {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px dashed var(--accent-pink);
+            color: var(--dark-pink);
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.05);
+            margin-bottom: 30px;
+        }
+
         /* Modal Panel Dueño */
         .modal {
             display: none;
@@ -299,11 +314,11 @@
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3 id="total-count">35</h3>
+                <h3 id="total-count">34</h3>
                 <p>Total de Utensilios</p>
             </div>
             <div class="stat-card">
-                <h3 id="available-count">35</h3>
+                <h3 id="available-count">34</h3>
                 <p>Disponibles</p>
             </div>
             <div class="stat-card">
@@ -323,6 +338,11 @@
         <div class="items-grid" id="items-container">
             <!-- Se llena dinámicamente con JavaScript -->
         </div>
+
+        <!-- Custom Final Message -->
+        <div class="custom-footer-msg">
+            ✨ Puedes llevar lo que gustes o lo que salga de tu creatividad ✨
+        </div>
     </div>
 
     <!-- Modal Panel Dueño -->
@@ -333,7 +353,7 @@
                 <h2>Acceso Panel Dueño</h2>
                 <p style="margin-bottom: 15px; font-size: 0.9rem; color: #666;">Ingresa la contraseña para ver quién lleva cada producto.</p>
                 <div class="login-box">
-                    <input type="password" id="owner-password" placeholder="Contraseña (por defecto: 1234)">
+                    <input type="password" id="owner-password" placeholder="Contraseña">
                     <button class="btn-action take" onclick="verifyOwner()">Ingresar</button>
                 </div>
             </div>
@@ -346,7 +366,6 @@
     </div>
 
     <script>
-        // Lista original de 35 utensilios
         const initialItems = [
             "Olla Multiusos", "Parrilla", "Pyrex", "Olla cocimiento lento", "Coffeemaker",
             "Olla arrocera", "Licuadora", "Cafetera", "Tostadora", "Microondas",
@@ -355,11 +374,10 @@
             "Vasos", "Vajilla", "Cubiertos", "Set de ollas", "Sartenes",
             "Moldes para hornear", "Exprimidor de cítricos", "Picadora de alimentos",
             "Hervidor eléctrico", "Waflera", "Sandwichera", "Espumador de leche",
-            "Extractor de humedad", "Pinzas de cocina", "Entre otros"
+            "Extractor de humedad", "Pinzas de cocina"
         ];
 
-        // Cargar datos guardados (permite persistencia local en tu navegador)
-        let items = JSON.parse(localStorage.getItem('kitchen_items')) || initialItems.map(name => ({
+        let items = JSON.parse(localStorage.getItem('kitchen_items_v2')) || initialItems.map(name => ({
             name: name,
             takenBy: null
         }));
@@ -367,7 +385,7 @@
         let currentFilter = 'all';
 
         function saveAndRender() {
-            localStorage.setItem('kitchen_items', JSON.stringify(items));
+            localStorage.setItem('kitchen_items_v2', JSON.stringify(items));
             render();
         }
 
@@ -437,7 +455,6 @@
             render();
         }
 
-        // Panel Dueño Lógica
         function openOwnerModal() {
             document.getElementById('owner-modal').style.display = 'flex';
         }
@@ -451,8 +468,7 @@
 
         function verifyOwner() {
             const pass = document.getElementById('owner-password').value;
-            // Contraseña predeterminada "1234" (puedes cambiarla aquí mismo si gustas)
-            if (pass === '1234') {
+            if (pass === '19962005') {
                 document.getElementById('owner-auth-section').style.display = 'none';
                 document.getElementById('owner-dashboard-section').style.display = 'block';
                 loadOwnerDashboard();
@@ -480,7 +496,6 @@
             });
         }
 
-        // Cargar vista inicial
         render();
     </script>
 </body>
